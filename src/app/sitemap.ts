@@ -1,13 +1,12 @@
 import { MetadataRoute } from 'next'
+import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 获取所有视频数据
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`)
-  const data = await response.json()
-  const videos = data.videos || []
+  const videos = await prisma.video.findMany()
 
   // 基础URL
-  const baseUrl = 'https://soraprompt.art'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://soraprompt.art'
 
   // 基础路由
   const routes = [
@@ -26,12 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ] as MetadataRoute.Sitemap
 
   // 视频页面路由
-  const videoRoutes = videos.map((video: any) => ({
+  const videoRoutes = videos.map((video) => ({
     url: `${baseUrl}/video/${video.id}`,
-    lastModified: new Date(),
+    lastModified: video.createdAt,
     changeFrequency: 'weekly',
     priority: 0.6,
-  })) as MetadataRoute.Sitemap
+  }))
 
   return [...routes, ...videoRoutes]
 }
