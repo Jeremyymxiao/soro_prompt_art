@@ -1,6 +1,6 @@
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -14,4 +14,4 @@ model Video {
   youtubeUrl   String
   thumbnailUrl String
   createdAt    DateTime @default(now())
-} 
+}
